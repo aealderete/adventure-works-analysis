@@ -1,13 +1,20 @@
 --- Exercise 2 ---
-SELECT COUNT(*) as n_orders
+SELECT MONTH(OrderDate) AS month_col, COUNT(*) as n_orders
 FROM Sales.SalesOrderHeader
 WHERE YEAR(OrderDate) = 2024
-GROUP BY MONTH(OrderDate);
+GROUP BY MONTH(OrderDate)
+ORDER BY month_col ASC;
 
 --- Exercise 3 ---
-SELECT ShipDate, DueDate
-FROM Sales.SalesOrderHeader
-WHERE ShipDate > DueDate;
+SELECT
+    COUNT(*)                                             AS n_orders,
+    COUNT(*) - COUNT(ShipDate)                           AS n_unshipped,
+    SUM(CASE WHEN ShipDate > DueDate THEN 1 ELSE 0 END)  AS n_late,
+    CAST(
+        SUM(CASE WHEN ShipDate > DueDate THEN 1 ELSE 0 END) * 100.0 / COUNT(*)
+        AS decimal(5,2)
+    )                                                    AS pct_late
+FROM Sales.SalesOrderHeader;
 
 --- Exercise 4 ---
 WITH line_items_cte AS (
